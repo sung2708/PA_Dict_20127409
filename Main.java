@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Main{
     public static String getKeyFromValue(Map<String, String>hm, String value) {
@@ -10,12 +11,22 @@ public class Main{
             }
             return null;
           }
-    public static void searchSlang(Map<String, String> map, Vector<String> history){
+    public static void searchSlang(Map<String, String> map, Vector<Dictionary> history){
         Scanner myObj = new Scanner(System.in);
-        System.out.println("Enter your slang word: ");
+        System.out.print("Enter your slang word: ");
         String Slang = myObj.nextLine();
-        history.add(Slang);
-        System.out.println(Slang + " meaning " + map.get(Slang));
+        do{
+            if(map.get(Slang)==null){
+                System.out.println("Slang is not exits, pls enter again!");
+                System.out.print("Enter your slang word: ");
+                Slang = myObj.nextLine();
+            }
+        }while(map.get(Slang)==null);
+        Dictionary h = new Dictionary();
+        h.setSlang(Slang);
+        h.setMean(map.get(Slang));
+        history.add(h);
+        System.out.println("-> " + "| "+ Slang + " | is " + map.get(Slang));
     }
 
     public static void searchDefinition(Map<String, String> map, Vector<Dictionary>D){
@@ -28,20 +39,24 @@ public class Main{
         
         for(int i=0;i<D.size();i++){
             if(D.get(i).getMean().toString().contains(word)){
-                String s = map.get(D.get(i).getMean());
+                String s = getKeyFromValue(map,D.get(i).getMean());
                 list.add(s);
             }
         }
-
+        if(list.size()== 0){
+            System.out.println("\t -> No keywords were found !!");
+        }else{
         System.out.println("All slang contain key word: ");
             for(int i = 0;i<list.size();i++){
-                System.out.println(list.get(i));
+                System.out.println("\t -> " + list.get(i));
+            }
         }
     }
 
-    public static void showHistory(Vector<String>s){
+    public static void showHistory(Vector<Dictionary>s){
+        System.out.print("History: \n");
         for(int i = 0;i<s.size();i++){
-            System.out.println(s.get(i));
+            System.out.println(s.get(i).getSlang()+" -> " + s.get(i).getMean());
         }
     }
 
@@ -66,7 +81,7 @@ public class Main{
                 String n = myObj.nextLine();
                 String newMean = myObj.nextLine();
                 String oldMean = map.get(Slang);
-                newMean = oldMean +  " |" + newMean;
+                newMean = oldMean +  "| " + newMean;
                 map.replace(Slang, newMean);
             }
         }  
@@ -80,40 +95,58 @@ public class Main{
     public static void editSlang(Map<String, String> map){
         Scanner myObj = new Scanner(System.in);
         System.out.println("Input slang word to edit: ");
-        String Slang = myObj.nextLine();
+        String Slang = " ";
+        do{
+            if(getKeyFromValue(map,Slang)!=null){
+            System.out.println("Slang is not exits, pls enter again!");
+            System.out.print("Enter your slang word: ");
+            Slang = myObj.nextLine();
+            }
+        }while(getKeyFromValue(map,Slang)!=null);
         System.out.println("Input your new defintion: ");
         String newMean = myObj.nextLine();
         map.replace(Slang, newMean);
+        System.out.println("Edit success!");
     }
 
     public static void deleteSlang(Map<String, String> map){
         Scanner myObj = new Scanner(System.in);
         System.out.println("Input slang word to delete: ");
-        String slang = myObj.nextLine();
-        System.out.println("Do you really want to delete?(y/n)");
-        String userChoose = myObj.nextLine();
-        if(userChoose =="Y" || userChoose == "y"){
-            String removeValue = (String)map.remove(slang);
+        String Slang = " ";
+        do{
+            if(map.get(Slang)==null){
+                System.out.println("Slang is not exits, pls enter again!");
+                System.out.print("Enter your slang word: ");
+                Slang = myObj.nextLine();
+            }
+        }while(getKeyFromValue(map,Slang)!=null);
+        System.out.println("Do you really want to delete?(0/1)");
+
+        int userChoose = myObj.nextInt();
+
+        if(userChoose == 1){
+            map.remove(Slang);
+            System.out.println("Successful delete!") ; 
+            }
+        else if (userChoose == 0){
+             System.out.println("This word has not been deleted!");      
         }
     }
 
-    public static void restoreData(Map<String, String> map){
+    public static void restoreData(Map<String, String> map, Vector<Dictionary> olDic){
         Scanner myObj = new Scanner(System.in);
-        System.out.println("Do you want to restore original data ?(y/n)");
-        String userChoose = myObj.nextLine();
-        if(userChoose == "Y" || userChoose =="y"){
-
-            map.clear();
-            Vector<Dictionary> Dics = new Vector<Dictionary>();
+        System.out.println("Do you want to restore original data ?(0/1)");
+        int userChoose = myObj.nextInt();
+        if(userChoose == 1){
             GetData data = new GetData();
-            Dics = data.GetAll();
-
-            for(int i=0;i<Dics.size();i++){
-                map.put(Dics.get(i).getSlang(), Dics.get(i).getMean());
-                } 
-            }
-        else if(userChoose == "N" || userChoose =="n"){
-            System.out.println("");
+            olDic = data.GetAll();
+            for(int i=0;i<olDic.size();i++){
+                map.put(olDic.get(i).getSlang(), olDic.get(i).getMean());
+            } 
+            System.out.println("Restore original data success!");
+        }
+        else if(userChoose == 0){
+            System.out.println("Restore original data failed!");
         }
     }
 
@@ -121,8 +154,8 @@ public class Main{
         Random rand = new Random();
         int n = rand.nextInt(7600);
 
-        System.out.println("On this day slang word is:....");
-        System.out.println(D.get(n).getSlang() + "  " +D.get(n).getMean() +"\n\n");
+        System.out.println("\t\tSlang for today is:..");
+        System.out.println("\t  | " + D.get(n).getSlang() + " | it meaning: " +D.get(n).getMean());
     }
 
     private static void GuestSlang(Map<String, String> map,Vector<Dictionary>D){
@@ -147,19 +180,19 @@ public class Main{
         ans.add(D.get(question+6).getMean());
 
         Collections.sort(ans);
-        System.out.println("Choose the answer: ");
         for(int i=0;i<ans.size();i++){
             System.out.println("\t" + id.get(i) + ". "+ ans.get(i));
         }
 
         Scanner myObj = new Scanner(System.in);
+        System.out.print("\nChoose the answer: ");
         String userAns = myObj.nextLine();
 
         if(ans.get(id.indexOf(userAns.toUpperCase())).contains(map.get(s))){
             System.out.println("Well Done, it is correct answer ><");
         }
         else{
-            System.out.println("Unlucky for you (⋟﹏⋞)");
+            System.out.println("Unlucky for you (ToT)");
         }
     }
 
@@ -185,19 +218,19 @@ public class Main{
         ans.add(D.get(question+6).getSlang());
 
         Collections.sort(ans);
-        System.out.println("Choose the answer: ");
         for(int i=0;i<ans.size();i++){
             System.out.println("\t" + id.get(i) + ". "+ ans.get(i));
         }
 
         Scanner myObj = new Scanner(System.in);
+        System.out.print("\nChoose the answer: ");
         String userAns = myObj.nextLine();
 
         if(ans.get(id.indexOf(userAns.toUpperCase())).contains(getKeyFromValue(map,s))){
             System.out.println("Well Done, it is correct answer ><");
         }
         else{
-            System.out.println("Unlucky for you (⋟﹏⋞)");
+            System.out.println("Unlucky for you (ToT)");
         }
 
 
@@ -210,26 +243,27 @@ public class Main{
         Dics = data.GetAll();
 
         Map<String, String> map  = new HashMap<>();
-        Vector<String> history =  new Vector<String>();
+        Vector<Dictionary> history =  new Vector<Dictionary>();
         for(int i=0;i<Dics.size();i++){
             map.put(Dics.get(i).getSlang(), Dics.get(i).getMean());
         } 
 
         Scanner myObj = new Scanner(System.in);
 
-        randomSlang(map,Dics);
-
-        do{
-            System.out.println("1. Seach Slang Word!");
-            System.out.println("2. Search Definition!");
-            System.out.println("3. See History!");
-            System.out.println("4. Add New Slang!");
-            System.out.println("5. Edit Slang!");
-            System.out.println("6. Delete Slang!");
-            System.out.println("7. Restore Original Data!");
-            System.out.println("8. Guest Slang!");
-            System.out.println("9. Guest Mean!");
-
+        do{ 
+            randomSlang(map,Dics);
+            System.out.println("\t-----------------------------------");
+            System.out.println("\t|\t1. Seach Slang Word!      |\t");
+            System.out.println("\t|\t2. Search Definition!     |\t");
+            System.out.println("\t|\t3. See History!           |\t");
+            System.out.println("\t|\t4. Add New Slang!         |\t");
+            System.out.println("\t|\t5. Edit Slang!            |\t");
+            System.out.println("\t|\t6. Delete Slang!          |\t");
+            System.out.println("\t|\t7. Restore Original Data! |\t");
+            System.out.println("\t|\t8. Guest Slang!           |\t");
+            System.out.println("\t|\t9. Guest Mean!            |\t");
+            System.out.println("\t|\t0. Exit!                  |\t");
+            System.out.println("\t-----------------------------------\t\n");
             System.out.print("Input your choose: ");
             int choose = myObj.nextInt();
 
@@ -271,6 +305,8 @@ public class Main{
                 editSlang(map);
                 Scanner scanner = new Scanner(System.in);
                 scanner.nextLine();
+                System.out.println("Press \"ENTER\" to continue...");
+                scanner.nextLine();
             }
             else if(choose == 6){
                 System.out.print("\033[H\033[2J");  
@@ -281,9 +317,10 @@ public class Main{
                 scanner.nextLine();
             }
             else if(choose == 7){
+                map.clear();
                 System.out.print("\033[H\033[2J");  
                 System.out.flush();
-                restoreData(map);
+                restoreData(map,Dics);
                 System.out.println("Press \"ENTER\" to continue...");
                 Scanner scanner = new Scanner(System.in);
                 scanner.nextLine();
@@ -303,6 +340,9 @@ public class Main{
                 System.out.println("Press \"ENTER\" to continue...");
                 Scanner scanner = new Scanner(System.in);
                 scanner.nextLine();
+            }
+            else if(choose == 0){
+                System.exit(0);
             }
         }while(true);
 
