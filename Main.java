@@ -34,7 +34,7 @@ public class Main{
         Vector<String> list = new Vector<String>();
 
         Scanner myObj = new Scanner(System.in);
-        System.out.println("Enter your word: ");
+        System.out.print("Enter your word: ");
         String word = myObj.nextLine();
         
         for(int i=0;i<D.size();i++){
@@ -62,7 +62,7 @@ public class Main{
 
     public static void addMean(Map<String, String> map){
         Scanner myObj = new Scanner(System.in);
-        System.out.println("Enter your slang word: ");
+        System.out.print("Enter your slang word: ");
         String Slang = myObj.nextLine();
 
         if(map.containsKey(Slang)){
@@ -71,13 +71,13 @@ public class Main{
             System.out.println("2. Do you want to Duplicate");
             int userChoose = myObj.nextInt();
             if(userChoose == 1){
-                System.out.println("Input your new defintion: ");
+                System.out.print("Input your new defintion: ");
                 String n = myObj.nextLine();
                 String newMean = myObj.nextLine();
                 map.replace(Slang, newMean);
             }
             else if(userChoose == 2){
-                System.out.println("Input your second defintion: ");
+                System.out.print("Input your second defintion: ");
                 String n = myObj.nextLine();
                 String newMean = myObj.nextLine();
                 String oldMean = map.get(Slang);
@@ -86,7 +86,7 @@ public class Main{
             }
         }  
         else{
-            System.out.println("Enter your mean ^^ : ");
+            System.out.print("Enter your mean ^^ : ");
             String newMean = myObj.nextLine();
             map.put(Slang, newMean);
         }
@@ -94,16 +94,16 @@ public class Main{
 
     public static void editSlang(Map<String, String> map){
         Scanner myObj = new Scanner(System.in);
-        System.out.println("Input slang word to edit: ");
-        String Slang = " ";
+        System.out.print("Input slang word to edit: ");
+        String Slang = myObj.nextLine();
         do{
-            if(getKeyFromValue(map,Slang)!=null){
-            System.out.println("Slang is not exits, pls enter again!");
-            System.out.print("Enter your slang word: ");
-            Slang = myObj.nextLine();
+            if(getKeyFromValue(map,Slang)==null){
+                System.out.println("Slang is not exits, pls enter again!");
+                System.out.print("Enter your slang word: ");
+                Slang = myObj.nextLine();
             }
-        }while(getKeyFromValue(map,Slang)!=null);
-        System.out.println("Input your new defintion: ");
+        }while(map.get(Slang)==null);
+        System.out.print("Input your new defintion: ");
         String newMean = myObj.nextLine();
         map.replace(Slang, newMean);
         System.out.println("Edit success!");
@@ -111,15 +111,15 @@ public class Main{
 
     public static void deleteSlang(Map<String, String> map){
         Scanner myObj = new Scanner(System.in);
-        System.out.println("Input slang word to delete: ");
-        String Slang = " ";
+        System.out.print("Input slang word to delete: ");
+        String Slang = myObj.nextLine();
         do{
             if(map.get(Slang)==null){
                 System.out.println("Slang is not exits, pls enter again!");
                 System.out.print("Enter your slang word: ");
                 Slang = myObj.nextLine();
             }
-        }while(getKeyFromValue(map,Slang)!=null);
+        }while(map.get(Slang)==null);
         System.out.println("Do you really want to delete?(0/1)");
 
         int userChoose = myObj.nextInt();
@@ -155,7 +155,7 @@ public class Main{
         int n = rand.nextInt(7600);
 
         System.out.println("\t\tSlang for today is:..");
-        System.out.println("\t  | " + D.get(n).getSlang() + " | it meaning: " +D.get(n).getMean());
+        System.out.println("\t  | " + D.get(n).getSlang() + " |it meaning: " +D.get(n).getMean());
     }
 
     private static void GuestSlang(Map<String, String> map,Vector<Dictionary>D){
@@ -192,7 +192,7 @@ public class Main{
             System.out.println("Well Done, it is correct answer ><");
         }
         else{
-            System.out.println("Unlucky for you (ToT)");
+            System.out.println("Unlucky for you (T.T)");
         }
     }
 
@@ -230,10 +230,8 @@ public class Main{
             System.out.println("Well Done, it is correct answer ><");
         }
         else{
-            System.out.println("Unlucky for you (ToT)");
+            System.out.println("Unlucky for you (T.T)");
         }
-
-
     }
 
     public static void run(){
